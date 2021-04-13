@@ -9,9 +9,6 @@ class Rounds:
         self.knife_round = True
 
     def round_end(self, winner):
-        if self.knife_round:
-            self.knife_round = False
-            return 0
         if winner == self.CT_TEAM:
             if self.sum() < 15:
                 self.t1_score += 1

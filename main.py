@@ -25,7 +25,7 @@ if __name__ == '__main__':
     file_name = req.download_demo('1-aeab5d71-2f11-4a76-a47b-77df30ea377e')
     out_file_name = f'{file_name.split(".")[0]}'
     # path = default_storage.path(file_name)
-    subprocess.run(['./csparser.exe', '-demo', file_name,
+    subprocess.run(['./csminify.exe', '-demo', file_name,
                     '-format', 'json',
                     '-freq', '8',
                     '-out', out_file_name])

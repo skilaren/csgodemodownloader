@@ -45,8 +45,8 @@ class DemoParser:
             grenades_info[player]['grenades_amount'] = len(nades)
             grenades_info[player]['successful_grenades_amount'] = len([x for x in nades if x.effective])
 
-        results['flashes'] = flashes_info
-        results['grenades'] = grenades_info
+        # results['flashes'] = flashes_info
+        # results['grenades'] = grenades_info
         results['players'] = players
         results['stats'] = get_all_stats(demo)
         results['stupid_deaths'] = deaths_with_knife(demo, players)

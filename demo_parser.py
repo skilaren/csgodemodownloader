@@ -1,3 +1,5 @@
+import datetime
+
 from maps import map_mappings
 from match import Rounds
 from grenades import Flash, HE, Smoke
@@ -269,13 +271,18 @@ def deaths_with_knife(dem, players):
 
 def get_all_stats(dem):
     players = get_players(dem)
+    date_played = datetime.datetime.strptime('2021-04-12', '%Y-%m-%d')
+    if date_played < datetime.datetime.strptime('2020-04-16', '%Y-%m-%d'):
+        warmup_rounds = 1
+    else:
+        warmup_rounds = 3
     overall_stats = MatchInfo(players)
-    knife_round = True
+    warmup_rounds_played = 0
 
     # Count KDA
     for tick in dem['ticks']:
         for event in tick['events']:
-            if not knife_round:
+            if warmup_rounds_played >= warmup_rounds:
                 if event['name'] == 'kill':
                     attrs = {}
                     for attr in event['attrs']:
@@ -296,13 +303,14 @@ def get_all_stats(dem):
                     if 'attacker' in attrs:
                         overall_stats.add_damage(attrs['attacker'], attrs['health_damage'])
             if event['name'] == EVENT_ROUND_ENDED:
-                knife_round = False
-                attrs_array = event['attrs']
-                attrs = {}
-                for attr in attrs_array:
-                    attrs[attr['key']] = attr['numVal']
+                if warmup_rounds_played >= warmup_rounds:
+                    attrs_array = event['attrs']
+                    attrs = {}
+                    for attr in attrs_array:
+                        attrs[attr['key']] = attr['numVal']
 
-                overall_stats.new_round(attrs['winner'])
+                    overall_stats.new_round(attrs['winner'])
+                warmup_rounds_played += 1
 
     return overall_stats.get_stats()
 
