@@ -1,5 +1,7 @@
 import json
 import os
+import gzip
+import shutil
 from datetime import datetime
 from urllib.parse import urljoin
 
@@ -55,6 +57,10 @@ class Requester:
         start = datetime.now()
         with open('match.dem.gz', 'wb') as demo_file:
             demo_file.write(self._get(demo_url))
+        with gzip.open('match.dem.gz', 'rb') as f_in:
+            with open('match.dem', 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
         end = datetime.now()
         print(f'Demo downloaded: "{match_id}". Size: {int(os.path.getsize("match.dem.gz") / 1024 / 1024)} MB. '
               f'Time: {end - start}')
+        return 'match.dem'

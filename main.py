@@ -1,29 +1,40 @@
-import json
-import pprint
+import subprocess
 
-from player_info import get_player_info, Player
+from csparser import DemoParser
 from requester import Requester
 
-r = Requester()
+if __name__ == '__main__':
 
-players = {}
+    r = Requester()
+    players = {}
 
-ranks_players = {
-    1: 0,
-    2: 0,
-    3: 0,
-    4: 0,
-    5: 0,
-    6: 0,
-    7: 0,
-    8: 0,
-    9: 0,
-    10: 0
-}
+    ranks_players = {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+        6: 0,
+        7: 0,
+        8: 0,
+        9: 0,
+        10: 0
+    }
 
-from requester import Requester
-req = Requester()
-req.download_demo('1-aeab5d71-2f11-4a76-a47b-77df30ea377e')
+    req = Requester()
+    file_name = req.download_demo('1-aeab5d71-2f11-4a76-a47b-77df30ea377e')
+    out_file_name = f'{file_name.split(".")[0]}'
+    # path = default_storage.path(file_name)
+    subprocess.run(['./csparser.exe', '-demo', file_name,
+                    '-format', 'json',
+                    '-freq', '8',
+                    '-out', out_file_name])
+
+    result = DemoParser.parse(out_file_name)
+    print(result)
+# if file_name != 'trial_demo_to_demo.dem':
+#     default_storage.delete(file_name)
+#     default_storage.delete(out_file_name)
 
 # for i in range(10):
 #     with open(f'results{i}.csv', mode='w+') as res_file:

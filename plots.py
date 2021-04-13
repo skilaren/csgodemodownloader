@@ -8,6 +8,7 @@ x_label = 'Headshots per Match'
 
 # plt.plot(df.Elo.values[df['Matches'] > 500], df['Matches'].values[df['Matches'] > 500], 'bo', alpha=0.1)
 plt.plot(df[x_label].values, df.Elo.values, 'bo', alpha=0.1)
+print(np.mean(df.Matches))
 plt.ylabel('Elo')
 plt.xlabel(x_label)
 x_min, x_max = plt.xlim()
