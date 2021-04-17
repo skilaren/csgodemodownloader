@@ -11,7 +11,7 @@ import requests
 class Requester:
 
     API_TOKEN = '2ba07897-5c23-405c-9633-3b6197a07ab5'
-    API_GAME_TOKEN = '3d08a8ba-830b-4a30-8f43-6a0f2cc0c03b'
+    API_GAME_TOKEN = 'b435db82-d553-4346-86d5-b40396e2df53'
     BASE_URL = 'https://open.faceit.com/data/v4/'
     BASE_URL_V2 = 'https://api.faceit.com/match-history/v4/matches/competition'
     MATCH_INFO_URL = 'matches/'
@@ -24,11 +24,11 @@ class Requester:
         }
         url = urljoin(self.BASE_URL, url)
         response = requests.get(url, headers=headers)
-        return response.content
+        return response.json()
 
     def _get(self, url):
         response = requests.get(url)
-        return response.content
+        return response.json()
 
     def get_matches(self, page):
         headers = {
@@ -43,13 +43,34 @@ class Requester:
         }
         url = urljoin(self.BASE_URL, self.BASE_URL_V2)
         response = requests.get(url, headers=headers, params=params)
-        return response.content
+        return response.json()
 
     def get_player_stats(self, player_id):
         return self.get(f'players/{player_id}/stats/csgo')
 
     def get_player_details(self, player_id):
         return self.get(f'players/{player_id}')
+
+    def get_match_stats(self, match_id, chosen_player_id):
+        stats = self.get(f'matches/{match_id}/stats')
+        if chosen_player_id:
+            for team in stats['teams']:
+                for player in team['players']:
+                    if player['player_id'] == chosen_player_id:
+                        return player['player_stats']
+        else:
+            return stats
+
+    def get_player_matches(self, player_id, matches_amount):
+        matches = []
+        for i in range(0, matches_amount, 100):
+            matches_batch = self.get(f'players/{player_id}/history')['items']
+            for match in matches_batch:
+                matches.append({
+                    'id': match['match_id'],
+                    'started': match['started_at']
+                })
+        return matches
 
     def download_demo(self, match_id):
         match_info = json.loads(self.get(f'{self.MATCH_INFO_URL}/{match_id}'))

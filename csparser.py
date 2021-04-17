@@ -7,12 +7,12 @@ from utils import group_grenades_by_player
 class DemoParser:
 
     @staticmethod
-    def parse(demo_json_file_path):
+    def parse(demo_json_file_path, chosen_player=None):
         # Read demo file
         results = {}
 
         # Read demo file
-        with open(demo_json_file_path) as f:
+        with open(demo_json_file_path, encoding='utf-8') as f:
             demo = json.load(f)
 
         results['map_name'] = demo['header']['map']
@@ -45,10 +45,17 @@ class DemoParser:
             grenades_info[player]['grenades_amount'] = len(nades)
             grenades_info[player]['successful_grenades_amount'] = len([x for x in nades if x.effective])
 
-        # results['flashes'] = flashes_info
-        # results['grenades'] = grenades_info
-        results['players'] = players
-        results['stats'] = get_all_stats(demo)
-        results['stupid_deaths'] = deaths_with_knife(demo, players)
-        results['score'] = get_score(demo)
+        chosen_player_id = None
+        for player_id, info in players.items():
+            if info['name'] == chosen_player:
+                chosen_player_id = player_id
+                break
+        if chosen_player_id:
+            results['flashes'] = flashes_info[chosen_player_id]
+            del results['flashes']['flashes']
+            results['grenades'] = grenades_info[chosen_player_id]
+            del results['grenades']['grenades']
+            results['stats'] = get_all_stats(demo)[chosen_player_id]
+            results['stupid_deaths'] = deaths_with_knife(demo, players)[chosen_player_id]
+
         return results

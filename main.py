@@ -1,3 +1,4 @@
+import pprint
 import subprocess
 
 from csparser import DemoParser
@@ -22,7 +23,7 @@ if __name__ == '__main__':
     }
 
     req = Requester()
-    file_name = req.download_demo('1-aeab5d71-2f11-4a76-a47b-77df30ea377e')
+    file_name = req.download_demo('1-3938954f-36be-491c-8e42-017fac942a0b')
     out_file_name = f'{file_name.split(".")[0]}'
     # path = default_storage.path(file_name)
     subprocess.run(['./csminify.exe', '-demo', file_name,
@@ -30,8 +31,8 @@ if __name__ == '__main__':
                     '-freq', '8',
                     '-out', out_file_name])
 
-    result = DemoParser.parse(out_file_name)
-    print(result)
+    result = DemoParser.parse(out_file_name, chosen_player='bwoken')
+    pprint.pprint(result)
 # if file_name != 'trial_demo_to_demo.dem':
 #     default_storage.delete(file_name)
 #     default_storage.delete(out_file_name)

@@ -1,5 +1,8 @@
 import json
+import sqlite3
 from dataclasses import dataclass
+
+from requester import Requester
 
 allowed_maps = {
     'de_mirage', 'de_train', 'de_dust2', 'de_overpass', 'de_cache', 'de_nuke', 'de_vertigo', 'de_inferno', 'de_cbble'
@@ -41,6 +44,26 @@ class PlayerStats:
             'Rounds': self.rounds
         })
 
+    def to_dict(self):
+        return {
+            'Average Assists': self.assists / self.matches,
+            'Average Deaths': self.deaths / self.matches,
+            'Average Headshots %': self.headshots / self.kills,
+            'Headshots per Match': self.headshots / self.matches,
+            'K/D Ratio': self.kills - self.deaths,
+            'K/D Ratio (%)': self.kills / self.deaths,
+            'K/R Ratio': self.kills / self.rounds,
+            'Average Kills': self.kills / self.matches,
+            'Average MVPs': self.mvps / self.matches,
+            'Average Penta Kills': self.penta_kills / self.matches,
+            'Average Quadro Kills': self.quadro_kills / self.matches,
+            'Average Triple Kills': self.triple_kills / self.matches,
+            'Matches': self.matches,
+            'Wins': self.wins,
+            'Winrate': self.wins / self.matches,
+            'Rounds': self.rounds
+        }
+
     def to_csv(self):
         return f'{self.assists / self.matches},' \
                f'{self.deaths / self.matches},' \
@@ -70,15 +93,68 @@ class PlayerStats:
 
 @dataclass
 class Player:
-
     stats: PlayerStats
     rank: int
     nickname: str
     id: str
+    faceit_id: str
     elo: int
 
     def to_csv(self):
         return f'{self.stats.to_csv()},{self.rank},{self.elo},{self.nickname}\n'
+
+    def save_to_db_faceit_stats(self):
+        try:
+            stats = self.stats.to_dict()
+            sql = f"""
+            INSERT INTO players (avg3k, avg4k, avg5k, avg_assists, avg_deaths, 
+             avg_headshots, avg_kills, avg_mvps, elo, hs_per_match, 
+             kd_ratio, kr_ratio, matches, nickname, rank, rounds, winrate, wins, faceit_id) VALUES 
+             (
+                {stats['Average Triple Kills']}, 
+                {stats['Average Quadro Kills']},
+                {stats['Average Penta Kills']},
+                {stats['Average Assists']},
+                {stats['Average Deaths']},
+                {stats['Average Headshots %']}, 
+                {stats['Average Kills']}, 
+                {stats['Average MVPs']},
+                {self.elo},
+                {stats['Headshots per Match']}, 
+                {stats['K/D Ratio']},
+                {stats['K/R Ratio']}, 
+                {stats['Matches']},
+                '{self.nickname}',
+                {self.rank},
+                {stats['Rounds']},
+                {stats['Winrate']}, 
+                {stats['Wins']},
+                '{self.faceit_id}'
+             )
+            """
+            con = sqlite3.connect('identifier.sqlite')
+            cur = con.cursor()
+            cur.execute(sql)
+            cur.close()
+            con.commit()
+            con.close()
+        except sqlite3.IntegrityError:
+            print(f'Player {self.faceit_id} already in db')
+
+    def load_matches_to_db_and_celery(self):
+        r = Requester()
+        matches = r.get_player_matches(self.faceit_id, self.stats.matches)
+        matches_data = [(match['id'], self.faceit_id, match['started']) for match in matches]
+        sql = f"""
+            INSERT INTO matches (faceit_id, player_faceit_id, date_played) VALUES 
+             (?, ?, ?) 
+            """
+        con = sqlite3.connect('identifier.sqlite')
+        cur = con.cursor()
+        cur.executemany(sql, matches_data)
+        cur.close()
+        con.commit()
+        con.close()
 
 
 def get_player_info(stats_json):

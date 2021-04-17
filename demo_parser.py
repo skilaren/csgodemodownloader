@@ -10,6 +10,9 @@ T_TEAM = 2
 
 EVENT_FLASHED = 'flashed'
 EVENT_ROUND_ENDED = 'round_ended'
+EVENT_ROUND_START = 'round_started'
+EVENT_MATCH_START = 'match_started'
+EVENT_GAME_PHASE_CHANGED = 'game_phase_changed'
 EVENT_GRENADE_DESTROY = 'grenade_destroy'
 EVENT_HURT = 'hurt'
 
@@ -74,7 +77,7 @@ def get_he_grenades(dem):
                         attrs[attr['key']] = attr['numVal']
                 if attrs['weapon'] == EQUIP_HE:
                     last_nade.thrower = attrs.get('player')
-                    last_nade.trajectory = attrs['trajectory']
+                    # last_nade.trajectory = attrs['trajectory']
                     last_nade.g_round = rounds.sum() + 1
                     grenades.append(last_nade)
                     last_nade = HE(0, False, [], 0, 0)
@@ -134,12 +137,13 @@ def get_flashes(dem):
                 for attr in attrs_array:
                     if attr['key'] == 'trajectory':
                         attrs[attr['key']] = attr['trajectory']
+                        attrs[attr['key']] = attr['trajectory']
                     else:
                         attrs[attr['key']] = attr['numVal']
                 if attrs['weapon'] == EQUIP_FLASH:
                     flash_existed = True
                     last_flash.thrower = attrs.get('player')
-                    last_flash.trajectory = attrs['trajectory']
+                    # last_flash.trajectory = attrs['trajectory']
                     last_flash.g_round = rounds.sum() + 1
 
             # Event when some player is flashed
@@ -152,8 +156,8 @@ def get_flashes(dem):
 
                 thrower = last_flash.thrower
                 # Flash is effective if it affects enemies' team player
-                if 'player' in attrs and thrower is not None and players[thrower]['team'] != players[attrs['player']][
-                    'team']:
+                if 'player' in attrs and thrower is not None \
+                        and players[thrower]['team'] != players[attrs['player']]['team']:
                     last_flash.effective = True
                     last_flash.add_flash_duration(attrs['flashDuration'])
 
@@ -271,18 +275,14 @@ def deaths_with_knife(dem, players):
 
 def get_all_stats(dem):
     players = get_players(dem)
-    date_played = datetime.datetime.strptime('2021-04-12', '%Y-%m-%d')
-    if date_played < datetime.datetime.strptime('2020-04-16', '%Y-%m-%d'):
-        warmup_rounds = 1
-    else:
-        warmup_rounds = 3
     overall_stats = MatchInfo(players)
-    warmup_rounds_played = 0
+    game_started = False
+    knife_round_played = False
 
     # Count KDA
     for tick in dem['ticks']:
         for event in tick['events']:
-            if warmup_rounds_played >= warmup_rounds:
+            if game_started and knife_round_played:
                 if event['name'] == 'kill':
                     attrs = {}
                     for attr in event['attrs']:
@@ -301,16 +301,19 @@ def get_all_stats(dem):
                         else:
                             attrs[attr['key']] = 0
                     if 'attacker' in attrs:
-                        overall_stats.add_damage(attrs['attacker'], attrs['health_damage'])
-            if event['name'] == EVENT_ROUND_ENDED:
-                if warmup_rounds_played >= warmup_rounds:
+                        if attrs['attacker'] != attrs['player']:
+                            overall_stats.add_damage(attrs['attacker'], min(attrs['health_damage'], 100))
+                if event['name'] == EVENT_ROUND_ENDED:
                     attrs_array = event['attrs']
                     attrs = {}
                     for attr in attrs_array:
                         attrs[attr['key']] = attr['numVal']
 
                     overall_stats.new_round(attrs['winner'])
-                warmup_rounds_played += 1
+            if game_started and event['name'] == EVENT_MATCH_START:
+                knife_round_played = True
+            if event['name'] == EVENT_MATCH_START:
+                game_started = True
 
     return overall_stats.get_stats()
 
@@ -319,15 +322,22 @@ def get_score(dem):
     events_ticks = dem['ticks']
 
     rounds = Rounds()
+    game_started = False
+    knife_round_played = False
 
     for tick in events_ticks:
         for event in tick['events']:
-            if event['name'] == EVENT_ROUND_ENDED:
-                attrs_array = event['attrs']
-                attrs = {}
-                for attr in attrs_array:
-                    attrs[attr['key']] = attr['numVal']
+            if game_started and knife_round_played:
+                if event['name'] == EVENT_ROUND_ENDED:
+                    attrs_array = event['attrs']
+                    attrs = {}
+                    for attr in attrs_array:
+                        attrs[attr['key']] = attr['numVal']
 
-                rounds.round_end(attrs['winner'])
+                    rounds.round_end(attrs['winner'])
+            if game_started and event['name'] == EVENT_MATCH_START:
+                knife_round_played = True
+            if event['name'] == EVENT_MATCH_START:
+                game_started = True
 
     return {1: rounds.t1_score, 2: rounds.t2_score}

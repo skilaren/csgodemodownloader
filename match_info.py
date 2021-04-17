@@ -79,6 +79,12 @@ class MatchInfo:
         for player in self.players_info_overall.keys():
             self.players_info_overall[player]['adr'] = self.players_info_overall[player]['damage'] / rounds
 
+    def count_some(self):
+        rounds = self.rounds.sum()
+        for player in self.players_info_overall.keys():
+            self.players_info_overall[player]['kr_ratio'] = self.players_info_overall[player]['kills'] / rounds
+            self.players_info_overall[player]['kd_ratio'] = self.players_info_overall[player]['kills'] / self.players_info_overall[player]['deaths']
+
     def get_stats(self):
         self.count_hltv()
         self.count_kast()
