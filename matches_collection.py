@@ -32,5 +32,5 @@ for i in range(10):
                 counter += 1
                 if counter % 100 == 0:
                     print(counter)
-        if counter > 15000:
+        if counter > 200:
             break
