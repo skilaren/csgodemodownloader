@@ -1,4 +1,4 @@
-import json
+import uuid
 import os
 import gzip
 import shutil
@@ -30,6 +30,10 @@ class Requester:
         response = requests.get(url)
         return response.json()
 
+    def get_file(self, url):
+        response = requests.get(url)
+        return response.content
+
     def get_matches(self, page):
         headers = {
             'Authorization': f'Bearer {self.API_GAME_TOKEN}',
@@ -52,12 +56,12 @@ class Requester:
         return self.get(f'players/{player_id}')
 
     def get_match_stats(self, match_id, chosen_player_id):
-        stats = self.get(f'matches/{match_id}/stats')
+        stats = self.get(f'matches/{match_id}/stats')['rounds'][0]
         if chosen_player_id:
             for team in stats['teams']:
                 for player in team['players']:
                     if player['player_id'] == chosen_player_id:
-                        return player['player_stats']
+                        return player['player_stats'], player['nickname']
         else:
             return stats
 
@@ -68,20 +72,23 @@ class Requester:
             for match in matches_batch:
                 matches.append({
                     'id': match['match_id'],
-                    'started': match['started_at']
+                    'started': match['started_at'],
                 })
         return matches
 
     def download_demo(self, match_id):
-        match_info = json.loads(self.get(f'{self.MATCH_INFO_URL}/{match_id}'))
-        demo_url = match_info['demo_url'][0]
+        match_uuid = uuid.uuid4()
         start = datetime.now()
-        with open('match.dem.gz', 'wb') as demo_file:
-            demo_file.write(self._get(demo_url))
-        with gzip.open('match.dem.gz', 'rb') as f_in:
-            with open('match.dem', 'wb') as f_out:
-                shutil.copyfileobj(f_in, f_out)
+        if not os.path.exists(f'matches/{match_uuid}.dem.gz'):
+            match_info = self.get(f'{self.MATCH_INFO_URL}/{match_id}')
+            demo_url = match_info['demo_url'][0]
+            with open(f'matches/{match_uuid}.dem.gz', 'wb') as demo_file:
+                demo_file.write(self.get_file(demo_url))
+            with gzip.open(f'matches/{match_uuid}.dem.gz', 'rb') as f_in:
+                with open(f'matches/{match_uuid}.dem', 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
         end = datetime.now()
-        print(f'Demo downloaded: "{match_id}". Size: {int(os.path.getsize("match.dem.gz") / 1024 / 1024)} MB. '
+        print(f'Demo downloaded: "{match_id}". '
+              f'Size: {int(os.path.getsize(f"matches/{match_uuid}.dem.gz") / 1024 / 1024)} MB. '
               f'Time: {end - start}')
-        return 'match.dem'
+        return f'{match_uuid}'

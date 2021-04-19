@@ -1,8 +1,11 @@
 import json
-import sqlite3
 from dataclasses import dataclass
 
+import psycopg2
+
 from requester import Requester
+
+from tasks import load_and_store_stats
 
 allowed_maps = {
     'de_mirage', 'de_train', 'de_dust2', 'de_overpass', 'de_cache', 'de_nuke', 'de_vertigo', 'de_inferno', 'de_cbble'
@@ -132,14 +135,16 @@ class Player:
                 '{self.faceit_id}'
              )
             """
-            con = sqlite3.connect('identifier.sqlite')
+            con = psycopg2.connect("host=13.53.197.126 port=5432 dbname=csgo user=csgo password=csgo")
             cur = con.cursor()
             cur.execute(sql)
             cur.close()
             con.commit()
             con.close()
-        except sqlite3.IntegrityError:
+            return True
+        except psycopg2.IntegrityError:
             print(f'Player {self.faceit_id} already in db')
+            return False
 
     def load_matches_to_db_and_celery(self):
         r = Requester()
@@ -147,14 +152,16 @@ class Player:
         matches_data = [(match['id'], self.faceit_id, match['started']) for match in matches]
         sql = f"""
             INSERT INTO matches (faceit_id, player_faceit_id, date_played) VALUES 
-             (?, ?, ?) 
+             (%s, %s, to_timestamp(%s)) ON CONFLICT DO NOTHING;
             """
-        con = sqlite3.connect('identifier.sqlite')
+        con = psycopg2.connect("host=13.53.197.126 port=5432 dbname=csgo user=csgo password=csgo")
         cur = con.cursor()
         cur.executemany(sql, matches_data)
         cur.close()
         con.commit()
         con.close()
+        for match in matches_data:
+            load_and_store_stats.delay(match[0], self.faceit_id)
 
 
 def get_player_info(stats_json):
