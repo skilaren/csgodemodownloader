@@ -62,8 +62,9 @@ def load_and_store_stats(match_id, player_faceit_id):
         cur.close()
         con.commit()
         con.close()
-    except Exception:
+    except Exception as ex:
         logger.warning(f'[ERROR] match: {match_id} for player: {player_faceit_id}')
+        logger.warning(ex)
     finally:
         if os.path.exists(f'matches/{file_name}.json'):
             os.remove(f'matches/{file_name}.json')
