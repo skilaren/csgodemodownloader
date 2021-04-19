@@ -82,10 +82,10 @@ class Requester:
         if not os.path.exists(f'matches/{match_uuid}.dem.gz'):
             match_info = self.get(f'{self.MATCH_INFO_URL}/{match_id}')
             demo_url = match_info['demo_url'][0]
-            with open(f'matches/{match_uuid}.dem.gz', 'wb') as demo_file:
+            with open(f'matches/{match_uuid}.dem.gz', 'wb+') as demo_file:
                 demo_file.write(self.get_file(demo_url))
             with gzip.open(f'matches/{match_uuid}.dem.gz', 'rb') as f_in:
-                with open(f'matches/{match_uuid}.dem', 'wb') as f_out:
+                with open(f'matches/{match_uuid}.dem', 'wb+') as f_out:
                     shutil.copyfileobj(f_in, f_out)
         end = datetime.now()
         print(f'Demo downloaded: "{match_id}". '

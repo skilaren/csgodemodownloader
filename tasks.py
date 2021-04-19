@@ -21,7 +21,7 @@ def load_and_store_stats(match_id, player_faceit_id):
     file_name = req.download_demo(match_id)
     try:
         out_file_name = f'matches/{file_name}'
-        subprocess.run(['./csminify.exe', '-demo', f'matches/{file_name}.dem',
+        subprocess.run(['./csminify', '-demo', f'matches/{file_name}.dem',
                         '-format', 'json',
                         '-freq', '8',
                         '-out', out_file_name])
