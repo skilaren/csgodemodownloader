@@ -20,7 +20,7 @@ def load_and_store_stats(match_id, player_faceit_id):
     logger.warning(f'[STARTED] match: {match_id} for player: {player_faceit_id}')
     file_name = req.download_demo(match_id)
     try:
-        out_file_name = f'matches/{file_name}'
+        out_file_name = f'matches/{file_name}.json'
         subprocess.run(['./csminify.exe', '-demo', f'matches/{file_name}.dem',
                         '-format', 'json',
                         '-freq', '8',
@@ -65,7 +65,7 @@ def load_and_store_stats(match_id, player_faceit_id):
     except Exception:
         logger.warning(f'[ERROR] match: {match_id} for player: {player_faceit_id}')
     finally:
-        os.remove(f'matches/{file_name}')
+        os.remove(f'matches/{file_name}.json')
         os.remove(f'matches/{file_name}.dem')
         os.remove(f'matches/{file_name}.dem.gz')
     logger.warning(f'[ENDED] match: {match_id} for player: {player_faceit_id}')
