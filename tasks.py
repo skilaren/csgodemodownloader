@@ -65,7 +65,10 @@ def load_and_store_stats(match_id, player_faceit_id):
     except Exception:
         logger.warning(f'[ERROR] match: {match_id} for player: {player_faceit_id}')
     finally:
-        os.remove(f'matches/{file_name}.json')
-        os.remove(f'matches/{file_name}.dem')
-        os.remove(f'matches/{file_name}.dem.gz')
+        if os.path.exists(f'matches/{file_name}.json'):
+            os.remove(f'matches/{file_name}.json')
+        if os.path.exists(f'matches/{file_name}.dem'):
+            os.remove(f'matches/{file_name}.dem')
+        if os.path.exists(f'matches/{file_name}.dem.gz'):
+            os.remove(f'matches/{file_name}.dem.gz')
     logger.warning(f'[ENDED] match: {match_id} for player: {player_faceit_id}')
