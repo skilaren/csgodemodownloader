@@ -5,8 +5,8 @@ from requester import Requester
 
 r = Requester()
 
+counter = 0
 for i in range(10):
-    counter = 0
     match_history = r.get_matches(page=i)['payload']
     for match in match_history:
         print(f'matchId: {match["matchId"]}')
@@ -33,5 +33,4 @@ for i in range(10):
                 if player_info.save_to_db_faceit_stats():
                     player_info.load_matches_to_db_and_celery()
                 counter += 1
-                if counter % 20 == 0:
-                    print(counter)
+        print(counter)
