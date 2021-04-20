@@ -67,7 +67,7 @@ class Requester:
 
     def get_player_matches(self, player_id, matches_amount):
         matches = []
-        for i in range(0, matches_amount, 100):
+        for i in range(0, min(matches_amount, 1000), 100):
             try:
                 matches_batch = self.get(f'players/{player_id}/history?game=csgo&limit=100&offset={i}&from=0')['items']
             except KeyError:
