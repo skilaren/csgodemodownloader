@@ -166,19 +166,20 @@ class Player:
 
 def get_player_info(stats_json):
     player_stats = PlayerStats()
-    maps = stats_json['segments']
-    for _map in maps:
-        if _map['label'] in allowed_maps:
-            stats = _map['stats']
-            player_stats.assists += int(stats['Assists'])
-            player_stats.deaths += int(stats['Deaths'])
-            player_stats.headshots += int(stats['Headshots'])
-            player_stats.kills += int(stats['Kills'])
-            player_stats.mvps += int(stats['MVPs'])
-            player_stats.penta_kills += int(stats['Penta Kills'])
-            player_stats.quadro_kills += int(stats['Quadro Kills'])
-            player_stats.triple_kills += int(stats['Triple Kills'])
-            player_stats.wins += int(stats['Wins'])
-            player_stats.rounds += int(stats['Rounds'])
-            player_stats.matches += int(stats['Matches'])
-    return player_stats
+    if 'segments' in stats_json:
+        maps = stats_json['segments']
+        for _map in maps:
+            if _map['label'] in allowed_maps:
+                stats = _map['stats']
+                player_stats.assists += int(stats['Assists'])
+                player_stats.deaths += int(stats['Deaths'])
+                player_stats.headshots += int(stats['Headshots'])
+                player_stats.kills += int(stats['Kills'])
+                player_stats.mvps += int(stats['MVPs'])
+                player_stats.penta_kills += int(stats['Penta Kills'])
+                player_stats.quadro_kills += int(stats['Quadro Kills'])
+                player_stats.triple_kills += int(stats['Triple Kills'])
+                player_stats.wins += int(stats['Wins'])
+                player_stats.rounds += int(stats['Rounds'])
+                player_stats.matches += int(stats['Matches'])
+        return player_stats

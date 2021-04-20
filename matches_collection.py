@@ -13,6 +13,9 @@ for i in range(10):
         players = match['playingPlayers']
         for player in players:
             player_stats = get_player_info(r.get_player_stats(player))
+            if not player_stats:
+                print(f'Player "{player}" has no CS in his games')
+                continue
             player_details = r.get_player_details(player)
 
             try:
