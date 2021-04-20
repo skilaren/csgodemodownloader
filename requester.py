@@ -68,7 +68,7 @@ class Requester:
     def get_player_matches(self, player_id, matches_amount):
         matches = []
         for i in range(0, matches_amount, 100):
-            matches_batch = self.get(f'players/{player_id}/history')['items']
+            matches_batch = self.get(f'players/{player_id}/history?game=csgo&limit=100&offset={i}&from=0')['items']
             for match in matches_batch:
                 matches.append({
                     'id': match['match_id'],
