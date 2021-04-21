@@ -3,7 +3,6 @@ import os
 import gzip
 import shutil
 from datetime import datetime
-from json import JSONDecodeError
 from urllib.parse import urljoin
 
 import requests
@@ -25,6 +24,7 @@ class Requester:
         }
         url = urljoin(self.BASE_URL, url)
         response = requests.get(url, headers=headers)
+        response.raise_for_status()
         return response.json()
 
     def _get(self, url):
