@@ -17,6 +17,8 @@ class PlayerStats:
     assists: float = 0
     deaths: float = 0
     headshots: float = 0
+    headshots_p: float = 0
+    avg_kr: float = 0
     kills: float = 0
     mvps: float = 0
     penta_kills: float = 0
@@ -31,11 +33,12 @@ class PlayerStats:
         return json.dumps({
             'Average Assists': self.assists / self.matches,
             'Average Deaths': self.deaths / self.matches,
-            'Average Headshots %': self.headshots / self.kills,
+            'Average Headshots %': self.headshots_p / self.matches,
             'Headshots per Match': self.headshots / self.matches,
             'K/D Ratio': self.kills - self.deaths,
             'K/D Ratio (%)': self.kills / self.deaths,
             'K/R Ratio': self.kills / self.rounds,
+            'Avg K/R Ratio': self.avg_kr / self.matches,
             'Average Kills': self.kills / self.matches,
             'Average MVPs': self.mvps / self.matches,
             'Average Penta Kills': self.penta_kills / self.matches,
@@ -51,11 +54,12 @@ class PlayerStats:
         return {
             'Average Assists': self.assists / self.matches,
             'Average Deaths': self.deaths / self.matches,
-            'Average Headshots %': self.headshots / self.kills,
+            'Average Headshots %': self.headshots_p / self.matches,
             'Headshots per Match': self.headshots / self.matches,
             'K/D Ratio': self.kills - self.deaths,
             'K/D Ratio (%)': self.kills / self.deaths,
             'K/R Ratio': self.kills / self.rounds,
+            'Avg K/R Ratio': self.avg_kr / self.matches,
             'Average Kills': self.kills / self.matches,
             'Average MVPs': self.mvps / self.matches,
             'Average Penta Kills': self.penta_kills / self.matches,
@@ -125,7 +129,7 @@ class Player:
                 {self.elo},
                 {stats['Headshots per Match']}, 
                 {stats['K/D Ratio']},
-                {stats['K/R Ratio']}, 
+                {stats['Avg K/R Ratio']}, 
                 {stats['Matches']},
                 '{self.nickname}',
                 {self.rank},
@@ -174,6 +178,8 @@ def get_player_info(stats_json):
                 player_stats.assists += int(stats['Assists'])
                 player_stats.deaths += int(stats['Deaths'])
                 player_stats.headshots += int(stats['Headshots'])
+                player_stats.headshots_p += int(stats['Average Headshots %'])
+                player_stats.avg_kr += int(stats['Average K/R Ratio'])
                 player_stats.kills += int(stats['Kills'])
                 player_stats.mvps += int(stats['MVPs'])
                 player_stats.penta_kills += int(stats['Penta Kills'])
