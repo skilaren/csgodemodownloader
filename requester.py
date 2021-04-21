@@ -3,6 +3,7 @@ import os
 import gzip
 import shutil
 from datetime import datetime
+from json import JSONDecodeError
 from urllib.parse import urljoin
 
 import requests
@@ -84,7 +85,11 @@ class Requester:
         match_uuid = uuid.uuid4()
         start = datetime.now()
         if not os.path.exists(f'matches/{match_uuid}.dem.gz'):
-            match_info = self.get(f'{self.MATCH_INFO_URL}/{match_id}')
+            try:
+                match_info = self.get(f'{self.MATCH_INFO_URL}/{match_id}')
+            except JSONDecodeError as err:
+                print(self._get(urljoin(self.BASE_URL, f'{self.MATCH_INFO_URL}/{match_id}')))
+                raise err
             demo_url = match_info['demo_url'][0]
             with open(f'matches/{match_uuid}.dem.gz', 'wb+') as demo_file:
                 demo_file.write(self.get_file(demo_url))
