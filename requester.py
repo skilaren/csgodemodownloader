@@ -24,7 +24,7 @@ class Requester:
         }
         url = urljoin(self.BASE_URL, url)
         response = requests.get(url, headers=headers)
-        return response
+        return response.json()
 
     def _get(self, url):
         response = requests.get(url)
@@ -41,7 +41,7 @@ class Requester:
         }
         params = {
             'id': '42e160fc-2651-4fa5-9a9b-829199e27adb',
-            'page': page,
+            'page': page + 5,
             'size': 1000,
             'type': 'matchmaking'
         }
