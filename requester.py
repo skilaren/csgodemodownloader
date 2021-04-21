@@ -10,7 +10,7 @@ import requests
 
 class Requester:
 
-    API_TOKEN = '2ba07897-5c23-405c-9633-3b6197a07ab5'
+    API_TOKEN = '3aa3010a-5bf6-4387-bdce-adef4031aa36'
     API_GAME_TOKEN = 'b435db82-d553-4346-86d5-b40396e2df53'
     BASE_URL = 'https://open.faceit.com/data/v4/'
     BASE_URL_V2 = 'https://api.faceit.com/match-history/v4/matches/competition'
