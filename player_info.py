@@ -179,7 +179,7 @@ def get_player_info(stats_json):
                 player_stats.deaths += int(stats['Deaths'])
                 player_stats.headshots += int(stats['Headshots'])
                 player_stats.headshots_p += int(stats['Average Headshots %'])
-                player_stats.avg_kr += int(stats['Average K/R Ratio'])
+                player_stats.avg_kr += float(stats['Average K/R Ratio'])
                 player_stats.kills += int(stats['Kills'])
                 player_stats.mvps += int(stats['MVPs'])
                 player_stats.penta_kills += int(stats['Penta Kills'])
