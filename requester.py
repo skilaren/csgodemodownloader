@@ -24,7 +24,7 @@ class Requester:
         }
         url = urljoin(self.BASE_URL, url)
         response = requests.get(url, headers=headers)
-        return response.json()
+        return response
 
     def _get(self, url):
         response = requests.get(url)
