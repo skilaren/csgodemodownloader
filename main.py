@@ -1,4 +1,5 @@
-import sys
+import logging
+import threading
 
 from requests.exceptions import HTTPError
 
@@ -6,10 +7,11 @@ from player_info import get_player_info, Player
 from requester import Requester
 
 
-if __name__ == '__main__':
-    _, start, begin = sys.argv
+logger = logging.getLogger(__name__)
+
+
+def load_players(start, end):
     r = Requester()
-    players = {}
 
     ranks_players = {
         1: 0,
@@ -24,9 +26,7 @@ if __name__ == '__main__':
         10: 0
     }
 
-    req = Requester()
-
-    for i in range(int(start), int(begin)):
+    for i in range(start, end):
         with open(f'results{start}.csv', mode='w+') as res_file:
             res_file.write(
                 'Average Assists,'
@@ -52,7 +52,7 @@ if __name__ == '__main__':
             counter = 0
             match_history = r.get_matches(page=i)['payload']
             for match in match_history:
-                print(match['matchId'])
+                logger.warning(match['matchId'])
                 players = match['playingPlayers']
                 for player in players:
                     while True:
@@ -68,16 +68,23 @@ if __name__ == '__main__':
                                 faceit_id=''
                             )
                             res_file.write(player_info.to_csv())
-                            print(f'{player_info.nickname:20} {player_info.rank:3} {player_info.elo:5}')
+                            logger.warning(f'{player_info.nickname:20} {player_info.rank:3} {player_info.elo:5}')
                             ranks_players[player_info.rank] += 1
                             counter += 1
                             break
                         except KeyError:
-                            print(f'Player "{player}" has no CS in his games')
+                            logger.warning(f'Player "{player}" has no CS in his games')
                             break
                         except HTTPError:
-                            print(f'HTTPError')
+                            logger.warning(f'HTTPError')
                             continue
-                print(counter)
+                logger.warning(counter)
                 if counter > 1000:
                     break
+
+
+if __name__ == '__main__':
+    for j in range(11, 101, 10):
+        thread = threading.Thread(target=load_players, args=(j - 10, j))
+        thread.start()
+        logger.warning(f'thread {j} started')
