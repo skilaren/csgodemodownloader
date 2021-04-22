@@ -50,7 +50,7 @@ if __name__ == '__main__':
                 'Nickname\n'
             )
             counter = 0
-            match_history = json.loads(r.get_matches(page=i))['payload']
+            match_history = r.get_matches(page=i)['payload']
             for match in match_history:
                 print(match['matchId'])
                 players = match['playingPlayers']
