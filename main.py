@@ -64,7 +64,7 @@ if __name__ == '__main__':
                             rank=player_details['games']['csgo']['skill_level'],
                             id=player,
                             elo=player_details['games']['csgo']['faceit_elo'],
-                            faceit_id=player_details['faceit_id']
+                            faceit_id=''
                         )
                         res_file.write(player_info.to_csv())
                         print(f'{player_info.nickname:20} {player_info.rank:3} {player_info.elo:5}')
