@@ -29,7 +29,7 @@ class Requester:
 
     def _get(self, url):
         response = requests.get(url)
-        return response.json()
+        return response
 
     def get_file(self, url):
         response = requests.get(url)
