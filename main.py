@@ -1,16 +1,13 @@
-import json
-import pprint
-import subprocess
+import sys
 
 from requests.exceptions import HTTPError
 
-from csparser import DemoParser
 from player_info import get_player_info, Player
 from requester import Requester
 
 
 if __name__ == '__main__':
-
+    _, start, begin = sys.argv
     r = Requester()
     players = {}
 
@@ -29,8 +26,8 @@ if __name__ == '__main__':
 
     req = Requester()
 
-    for i in range(100):
-        with open(f'results{i}.csv', mode='w+') as res_file:
+    for i in range(int(start), int(begin)):
+        with open(f'results{start}.csv', mode='w+') as res_file:
             res_file.write(
                 'Average Assists,'
                 'Average Deaths,'
@@ -82,5 +79,5 @@ if __name__ == '__main__':
                             print(f'HTTPError')
                             continue
                 print(counter)
-                if counter > 10000:
+                if counter > 1000:
                     break
