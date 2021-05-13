@@ -6,12 +6,13 @@ from requester import Requester
 r = Requester()
 
 counter = 0
-for i in range(10):
+for i in range(1):
     match_history = r.get_matches(page=i)['payload']
     for match in match_history:
         print(f'matchId: {match["matchId"]}')
         players = match['playingPlayers']
         for player in players:
+            print(f'Player "{player}" started')
             player_stats = get_player_info(r.get_player_stats(player))
             if not player_stats:
                 print(f'Player "{player}" has no CS in his games')
@@ -30,7 +31,9 @@ for i in range(10):
             except KeyError:
                 print(f'Player "{player}" has no CS in his games')
             else:
+                print(f'Player "{player}" matches loading started')
                 if player_info.save_to_db_faceit_stats():
                     player_info.load_matches_to_db_and_celery()
                 counter += 1
+                print(f'Player "{player}" matches loading finished')
         print(counter)

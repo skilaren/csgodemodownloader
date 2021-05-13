@@ -8,13 +8,13 @@ from celery.utils.log import get_task_logger
 from csparser import DemoParser
 from requester import Requester
 
-app = Celery('tasks', broker='pyamqp://guest@localhost')
+app = Celery('tasks', broker='pyamqp://guest@13.49.67.1')
 
 
 logger = get_task_logger(__name__)
 
 
-@app.task
+@app.task(acks_late=True)
 def load_and_store_stats(match_id, player_faceit_id):
     req = Requester()
     logger.warning(f'[STARTED] match: {match_id} for player: {player_faceit_id}')
