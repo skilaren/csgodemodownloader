@@ -30,8 +30,7 @@ for i in range(10):
             except KeyError:
                 print(f'Player "{player}" has no CS in his games')
             else:
-                if player_info.stats.matches < 1000:
-                    if player_info.save_to_db_faceit_stats():
-                        player_info.load_matches_to_db_and_celery()
-                    counter += 1
+                if player_info.save_to_db_faceit_stats():
+                    player_info.load_matches_to_db_and_celery()
+                counter += 1
         print(counter)
