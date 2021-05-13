@@ -152,7 +152,7 @@ class Player:
 
     def load_matches_to_db_and_celery(self):
         r = Requester()
-        matches = r.get_player_matches(self.faceit_id, self.stats.matches)
+        matches = r.get_player_matches(self.faceit_id, 50)
         matches_data = [(match['id'], self.faceit_id, match['started']) for match in matches]
         sql = f"""
             INSERT INTO matches (faceit_id, player_faceit_id, date_played) VALUES 
