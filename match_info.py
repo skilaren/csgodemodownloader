@@ -7,6 +7,7 @@ class MatchInfo:
         self.players_info_round = {key: {'kills': 0, 'killed_by': None, 'assists': 0, } for key in players.keys()}
         self.players_info_overall = {key: {'kills': 0, 'deaths': 0, 'assists': 0,
                                            'damage': 0, 'kast_rounds': 0, 'f_blood': 0, 'f_death': 0,
+                                           'bomb_defused': 0, 'bomb_planted': 0,
                                            '1k': 0, '2k': 0, '3k': 0, '4k': 0, '5k': 0} for key in players.keys()}
         self.players = players
         self.rounds = Rounds()
@@ -45,6 +46,12 @@ class MatchInfo:
 
     def add_damage(self, player, damage):
         self.players_info_overall[player]['damage'] += damage
+
+    def add_bomb_planted(self, player):
+        self.players_info_overall[player]['bomb_planted'] += 1
+
+    def add_bomb_defused(self, player):
+        self.players_info_overall[player]['bomb_defused'] += 1
 
     def count_hltv(self):
         rounds = self.rounds.sum()

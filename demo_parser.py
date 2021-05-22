@@ -310,6 +310,14 @@ def get_all_stats(dem):
                         attrs[attr['key']] = attr['numVal']
 
                     overall_stats.new_round(attrs['winner'])
+                if event['name'] in ['bomb_planted', 'bomb_defused']:
+                    attrs = {}
+                    for attr in event['attrs']:
+                        attrs[attr['key']] = attr['numVal']
+                    if event['name'] == 'bomb_planted':
+                        overall_stats.add_bomb_planted(attrs['entityId'])
+                    if event['name'] == 'bomb_defused':
+                        overall_stats.add_bomb_defused(attrs['entityId'])
             if game_started and event['name'] == EVENT_MATCH_START:
                 knife_round_played = True
             if event['name'] == EVENT_MATCH_START:

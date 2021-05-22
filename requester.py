@@ -16,6 +16,7 @@ class Requester:
     BASE_URL_V2 = 'https://api.faceit.com/match-history/v4/matches/competition'
     MATCH_INFO_URL = 'matches/'
     GAME_ID = 'csgo'
+    BWOKEN_FACEI_ID = '76dba73e-75d8-43b5-86ba-23c6e3aac92f'
 
     def get(self, url):
         headers = {

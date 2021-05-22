@@ -1,4 +1,5 @@
 import os
+import pprint
 import subprocess
 
 import psycopg2
@@ -14,20 +15,22 @@ app = Celery('tasks', broker='pyamqp://guest@13.49.67.1')
 logger = get_task_logger(__name__)
 
 
-@app.task(acks_late=True)
+#@app.task(acks_late=True)
 def load_and_store_stats(match_id, player_faceit_id):
     req = Requester()
     logger.warning(f'[STARTED] match: {match_id} for player: {player_faceit_id}')
     file_name = req.download_demo(match_id)
     try:
         out_file_name = f'matches/{file_name}.json'
-        subprocess.run(['./csminify', '-demo', f'matches/{file_name}.dem',
+        subprocess.run(['./csminify.exe', '-demo', f'matches/{file_name}.dem',
                         '-format', 'json',
                         '-freq', '8',
                         '-out', out_file_name])
         logger.warning(f'[DEMO PARSED] match: {match_id} for player: {player_faceit_id}')
         faceit_stats, player_nickname = req.get_match_stats(match_id, player_faceit_id)
         result = DemoParser.parse(out_file_name, chosen_player=player_nickname)
+        pprint.pprint(result)
+        return None
         logger.warning(f'[PARSED] match: {match_id} for player: {player_faceit_id}')
 
         sql = f"""
