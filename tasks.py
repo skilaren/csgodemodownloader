@@ -56,7 +56,10 @@ def load_and_store_stats(match_id, player_faceit_id):
                              flash_duration = {result['flashes']['total_duration']},
                              he_thrown = {result['grenades']['grenades_amount']},
                              useful_he = {result['grenades']['successful_grenades_amount']},
-                             he_damage = {result['grenades']['total_damage']}
+                             he_damage = {result['grenades']['total_damage']},
+                             bomb_defused = {result['stats']['bomb_defused']},
+                             bomb_planted = {result['stats']['bomb_planted']},
+                             bomb_actions_total = {result['stats']['bomb_defused'] + result['stats']['bomb_planted']}
                              WHERE faceit_id = '{match_id}' AND player_faceit_id = '{player_faceit_id}'
                             """
         con = psycopg2.connect("host=13.53.197.126 port=5432 dbname=csgo user=csgo password=csgo")
