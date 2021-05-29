@@ -29,8 +29,6 @@ def load_and_store_stats(match_id, player_faceit_id):
         logger.warning(f'[DEMO PARSED] match: {match_id} for player: {player_faceit_id}')
         faceit_stats, player_nickname = req.get_match_stats(match_id, player_faceit_id)
         result = DemoParser.parse(out_file_name, chosen_player=player_nickname)
-        pprint.pprint(result)
-        return None
         logger.warning(f'[PARSED] match: {match_id} for player: {player_faceit_id}')
 
         sql = f"""
