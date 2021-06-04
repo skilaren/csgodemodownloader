@@ -152,14 +152,14 @@ def get_flashes(dem):
                 attrs_array = event['attrs']
                 attrs = {}
                 for attr in attrs_array:
-                    attrs[attr['key']] = attr['numVal']
+                    attrs[attr['key']] = attr.get('numVal', None)
 
                 thrower = last_flash.thrower
                 # Flash is effective if it affects enemies' team player
                 if 'player' in attrs and thrower is not None \
                         and players[thrower]['team'] != players[attrs['player']]['team']:
                     last_flash.effective = True
-                    last_flash.add_flash_duration(attrs['flashDuration'])
+                    last_flash.add_flash_duration(attrs['flashDuration'] or 0)
 
             # Event of ended round to track flashbangs by round
             if event['name'] == EVENT_ROUND_ENDED:

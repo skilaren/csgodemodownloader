@@ -22,7 +22,8 @@ class MatchInfo:
                 self.players_info_overall[player]['kast_rounds'] += 1
             # Stats for HLTV 2.0 rating
             if player_info['kills'] > 0:
-                self.players_info_overall[player][f'{player_info["kills"]}k'] += 1
+                kills = min(player_info['kills'], 5)
+                self.players_info_overall[player][f'{kills}k'] += 1
         self.players_info_round = {key: {'kills': 0, 'killed_by': None, 'assists': 0, } for key in self.players.keys()}
         self.rounds.round_end(winner)
         self.first_blood = True
